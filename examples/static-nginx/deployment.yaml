@@ -1,18 +1,19 @@
+# https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: example
   labels:
-    app: nginx-app
+    app: example-app
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: nginx-app
+      app: example-app
   template:
     metadata:
       labels:
-        app: nginx-app
+        app: example-app
     spec:
       containers:
       - name: nginx

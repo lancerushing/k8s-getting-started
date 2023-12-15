@@ -18,36 +18,61 @@ Create a cluster, then use `kubectl` to manage it. see: https://www.linode.com/d
 
 3. Put it all together
 
-
 ```shell
+## Local commands
+
+## Set KUBECONFIG env var
+export KUBECONFIG=~/Downloads/test-3-kubeconfig.yaml 
 
 ## Install the loadbalancer CONTROLLER
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-helm install ingress-nginx ingress-nginx/ingress-nginx
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.9.4/deploy/static/provider/cloud/deploy.yaml
+
+## OR !!!
+#helm upgrade --install ingress-nginx ingress-nginx \
+#  --repo https://kubernetes.github.io/ingress-nginx \
+#  --namespace ingress-nginx --create-namespace
+
+### Wait 5 seconds and then run to get the IP
+#
+kubectl get service --namespace ingress-nginx ingress-nginx-controller --output wide --watch
 
 ## Cert Manager
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.yaml
+## Check the pods
 kubectl get pods --namespace cert-manager
 
+# Confirm the IP
+curl http://172.233.134.153
+```
 
+### DNS example
 
-## Wait 30 seconds and then run
-kubectl get service --namespace default ingress-nginx-controller --output wide --watch
+Usually would have DNS pointing to your IP, but here we can use nip.io
+http://my-app.172-233-134-153.nip.io/
 
-#Check the IP:
-curl http://172.233.134.149
+* edit `examples/static-nginx/ingress.yaml` with the nip domain name
 
-# Now Apply (deploy) our app to the cluster
+```shell
+# Now Apply (deploy) the sample app to the cluster
 kustomize build examples/static-nginx/ | kubectl apply -f -
+```
 
+### Kustomize overlay example with multiple customers
 
-http://172.233.134.149.nip.io/
+DNS example, Get the IPs assigned to the ingress:
+`kubectl get service --namespace ingress-nginx ingress-nginx-controller --output wide --watch`
 
-http://172-233-134-149.nip.io/
+1. edit the `examples/customer-examples/customer-overlays/customer-a/ingress.yaml` file with your nip domain name
+2. edit the `examples/customer-examples/customer-overlays/customer-b/ingress.yaml` file with your nip domain name
 
+```shell
+
+# Now apply the two customers to the cluster
+kustomize build examples/customer-examples/customer-overlays/customer-a | kubectl apply -f -
+kustomize build examples/customer-examples/customer-overlays/customer-b | kubectl apply -f -
 
 ```
+
 
 ## Local Workstation Instructions
 
@@ -129,9 +154,13 @@ https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/
   * FluxCD
 
 
-## Insteresting Links
+## Interesting Links
 
 * https://stackoverflow.com/questions/54934095/where-is-the-full-kubernetes-yaml-spec
 * https://www.linode.com/docs/guides/deploy-nginx-ingress-on-lke/
 * https://www.linode.com/docs/products/compute/kubernetes/guides/load-balancing/
 * https://www.linode.com/docs/guides/how-to-configure-load-balancing-with-tls-encryption-on-a-kubernetes-cluster/
+* https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+* https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/linode.md
+* https://stackoverflow.com/questions/59844622/ingress-configuration-for-k8s-in-different-namespaces
+* https://stackoverflow.com/questions/51878195/kubernetes-cross-namespace-ingress-network/51899301#51899301

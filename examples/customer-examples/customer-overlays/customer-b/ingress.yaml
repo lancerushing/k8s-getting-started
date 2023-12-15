@@ -1,24 +1,23 @@
-# https://kubernetes.io/docs/reference/kubernetes-api/service-resources/ingress-v1/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: static-example
+  name: incoming
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - 172-233-134-153.nip.io
+        - customer-b.172-233-134-153.nip.io
       secretName: example-tls
   rules:
-  - host: 172-233-134-153.nip.io
+  - host: customer-b.172-233-134-153.nip.io
     http:
       paths:
       - pathType: Prefix
         path: "/"
         backend:
           service:
-            name: example-app
+            name: apache
             port:
               number: 80
