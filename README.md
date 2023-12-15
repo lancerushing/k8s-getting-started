@@ -6,8 +6,9 @@ Create a cluster, then use `kubectl` to manage it. see: https://www.linode.com/d
 
 1. Local Setup
 
-* Install kubectl (mandatory)
+* Install kubectl
 * Install kustomize
+* Install helm
 * Install kubectx (useful)
 
 2. Remote Setup
@@ -17,9 +18,36 @@ Create a cluster, then use `kubectl` to manage it. see: https://www.linode.com/d
 
 3. Put it all together
 
-`kustomize `
+
+```shell
+
+## Install the loadbalancer CONTROLLER
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx
+
+## Cert Manager
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.yaml
+kubectl get pods --namespace cert-manager
 
 
+
+## Wait 30 seconds and then run
+kubectl get service --namespace default ingress-nginx-controller --output wide --watch
+
+#Check the IP:
+curl http://172.233.134.149
+
+# Now Apply (deploy) our app to the cluster
+kustomize build examples/static-nginx/ | kubectl apply -f -
+
+
+http://172.233.134.149.nip.io/
+
+http://172-233-134-149.nip.io/
+
+
+```
 
 ## Local Workstation Instructions
 
@@ -27,7 +55,16 @@ Create a cluster, then use `kubectl` to manage it. see: https://www.linode.com/d
 
 https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 
-### Install kubectx
+```shell
+sudo port selfupdate
+sudo port install kubectl
+```
+
+### Install helm
+
+Useful for install third party apps into the cluster.
+
+https://helm.sh/docs/intro/install/
 
 ### Install Kustomize
 
@@ -35,9 +72,14 @@ https://kubectl.docs.kubernetes.io/installation/kustomize/
 
 Tool for maniuplating k8s yaml in a predictable way.  
 
+```shell
+sudo port install kustomize
+```
+
+### Install kubectx
+
 
 ## Kubernetes Resources (Jargon)
-
 
 ### Namespace
 
@@ -67,6 +109,15 @@ https://kubernetes.io/docs/concepts/services-networking/
 
 Networking "glue" layer.  PODS that handle incoming network connections will usually expose their ports with a named service. POD to POD conections. Exteral web services, etc, etc.
 
+### ingress
+
+Creates an incoming network connection handler.  Ingresses are provider specific on external implentation.  Linode will create a load balancer, AWS will create an ELB, etc.
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx
+
+
 ## Kustomize
 
 https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/
@@ -78,8 +129,9 @@ https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/
   * FluxCD
 
 
-
-
 ## Insteresting Links
 
 * https://stackoverflow.com/questions/54934095/where-is-the-full-kubernetes-yaml-spec
+* https://www.linode.com/docs/guides/deploy-nginx-ingress-on-lke/
+* https://www.linode.com/docs/products/compute/kubernetes/guides/load-balancing/
+* https://www.linode.com/docs/guides/how-to-configure-load-balancing-with-tls-encryption-on-a-kubernetes-cluster/
