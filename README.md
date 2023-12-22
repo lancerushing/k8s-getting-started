@@ -6,7 +6,7 @@ A simple way to think about kubernetes:
 
 1. Kubernetes Cluster - Group of compute "nodes" running your resources, and running the "control plane".
 2. Kubernetes Manifests - Yaml configuration that describe resources.
-3. Kubernetes Resources - Applications, networking rules, load balancers, configurations, etc, etc.
+3. Kubernetes Resources - Applications, networking rules, load balancers, configurations, etc.
 
 In a nutshell: 1. create a "cluster", 2. send some yaml "manifests" to it, 3. the cluster attempts to create/update the resources described in the manifests.
 
@@ -20,19 +20,20 @@ see: https://www.linode.com/docs/products/compute/kubernetes/get-started/
 * Install kustomize
 * Install helm
 * Install kubectx (useful)
+* Install kubectl-import (useful)
 
 2. Remote Setup
 
 * Create a cluster in linode
 * Download the "Kubeconfig" for the cluster
+* Then run `kubectl-import my-ctx-name ~/Downloads/clutser-name-kubeconfig.yaml`
 
 3. Put it all together
 
 ```shell
 ## Local commands
 
-## Set KUBECONFIG env var
-export KUBECONFIG=~/Downloads/test-3-kubeconfig.yaml 
+kubectx my-ctx-name
 
 ## Install the loadbalancer CONTROLLER
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.9.4/deploy/static/provider/cloud/deploy.yaml
@@ -113,6 +114,14 @@ sudo port install kustomize
 Useful `kubectx` tool for changing clusters, `kubens` tool for changing default namespace.
 
 https://github.com/ahmetb/kubectx#installation
+
+### Install kubectl-import
+
+https://github.com/lancerushing/kubectl-import
+
+```shell
+sudo curl -o /usr/local/bin/kubectl-import https://raw.githubusercontent.com/lancerushing/kubectl-import/master/kubectl-import && sudo chmod 0755 /usr/local/bin/kubectl-import
+```
 
 ```shell
 sudo port install kubectx
