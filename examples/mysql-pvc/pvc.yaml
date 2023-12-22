@@ -1,0 +1,12 @@
+# https://www.linode.com/docs/guides/deploy-volumes-with-the-linode-block-storage-csi-driver/
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: linode-block-storage-retain
