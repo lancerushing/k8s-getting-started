@@ -8,6 +8,7 @@ kind: Kustomization
 namespace: mysql-example
 
 resources:
+  - basic-auth.yaml
   - namespace.yaml
   - secret.yaml
   - pvc.yaml
